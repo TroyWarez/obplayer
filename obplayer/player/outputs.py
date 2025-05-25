@@ -172,7 +172,16 @@ class ObAudioMixerBin(ObOutputBin):
         fade_time = arguments["time"]
         fade_run_per_second = 20
 
-        obplayer.Log.log("main fade from " + str(round(current_volume * 100)) + "% to " + str(round(target_volume * 100)) + "% in " + str(fade_time) + "s", "debug")
+        obplayer.Log.log(
+            "main fade from "
+            + str(round(current_volume * 100))
+            + "% to "
+            + str(round(target_volume * 100))
+            + "% in "
+            + str(fade_time)
+            + "s",
+            "debug",
+        )
 
         # if fade time is zero, just set target volume
         if fade_time == 0:
@@ -226,9 +235,13 @@ class ObAudioMixerBin(ObOutputBin):
         obplayer.Log.log("mixer received instruction " + instruction, "debug")
         # TODO instruction should be more like "mixer_mode_alert" here? (confusing with above alert/on which are different)
         if instruction == "alert_on":
-            self.pipeline_main.get_by_name("mixer-primary-volume").set_property("volume", 0.0)
+            self.pipeline_main.get_by_name("mixer-primary-volume").set_property(
+                "volume", 0.0
+            )
         elif instruction == "alert_off":
-            self.pipeline_main.get_by_name("mixer-primary-volume").set_property("volume", 1.0)
+            self.pipeline_main.get_by_name("mixer-primary-volume").set_property(
+                "volume", 1.0
+            )
         elif instruction == "voicetrack_on":
             self.main_fade({"volume": arguments["volume"], "time": arguments["fade"]})
         elif instruction == "voicetrack_off":

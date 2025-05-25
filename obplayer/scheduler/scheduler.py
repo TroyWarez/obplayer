@@ -33,8 +33,8 @@ class ObPlaylist(object):
         self.voicetracks = obplayer.RemoteData.get_show_voicetracks(show_id)
 
         # how close to the voicetrack before we return it to queue playback?
-        self.voicetrack_timing_tolerance = 1 
-        self.voicetrack_none_until = 0 # allow us to delay the next voicetrack return to prevent duplicate play requests
+        self.voicetrack_timing_tolerance = 1
+        self.voicetrack_none_until = 0  # allow us to delay the next voicetrack return to prevent duplicate play requests
 
         if not self.voicetracks:
             self.voicetracks = []
@@ -60,7 +60,7 @@ class ObPlaylist(object):
         self.voicetrack_none_until = time.time() + self.voicetrack_timing_tolerance
 
     def current_voicetrack(self, current_track_position):
-        if(self.voicetrack_none_until > time.time()):
+        if self.voicetrack_none_until > time.time():
             return None
 
         current = self.current()
@@ -73,14 +73,14 @@ class ObPlaylist(object):
                 if delta >= 0 and delta < self.voicetrack_timing_tolerance:
                     self.delay_voicetrack()
                     return [voicetrack, delta]
-                
+
             # if the voicetrack is set relative to the next track, but has a negative delay, then it plays at the end of this track
             if voicetrack["order_num"] == (self.pos + 1) and voicetrack["delay"] < 0:
                 delta = track_ends_in - abs(voicetrack["delay"])
                 if delta >= 0 and delta < self.voicetrack_timing_tolerance:
                     self.delay_voicetrack()
                     return [voicetrack, delta]
-            
+
         return None
 
     def increment(self):
@@ -239,9 +239,11 @@ class ObShow(object):
         # self.ctrl.add_request(media_type='break', end_time=self.end_time(), title = "break (filling spaces)")
 
     def play_current_voicetrack(self, present_time):
-        voicetrack = self.playlist.current_voicetrack(present_time - self.media_start_time)
-        if(voicetrack):
-           self.play_voicetrack(voicetrack[0], voicetrack[1], present_time)
+        voicetrack = self.playlist.current_voicetrack(
+            present_time - self.media_start_time
+        )
+        if voicetrack:
+            self.play_voicetrack(voicetrack[0], voicetrack[1], present_time)
 
     def play_current(self, present_time):
         if self.is_paused():
@@ -566,7 +568,7 @@ class ObScheduler:
         self.ctrl = obplayer.Player.create_controller(
             "scheduler", priority=50, default_play_mode="overlap", allow_overlay=False
         )
-        
+
         self.ctrl.set_request_callback(self.do_player_request)
         self.ctrl.set_update_callback(self.do_player_update)
 
@@ -583,7 +585,7 @@ class ObScheduler:
     # update request after initial?
     def do_voicetrack_update(self, ctrl, present_time):
         self.voicetrack_ctrl.set_next_update(present_time + 0.25)
-        if(self.present_show):
+        if self.present_show:
             self.present_show.play_current_voicetrack(present_time)
 
         # self.check_show(present_time)
