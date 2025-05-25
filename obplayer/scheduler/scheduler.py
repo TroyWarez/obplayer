@@ -64,6 +64,11 @@ class ObPlaylist(object):
             return None
 
         current = self.current()
+
+        # voicetrack is always played relative to the current or next track
+        if not current:
+            return None
+
         track_ends_in = current["duration"] - current_track_position
 
         for voicetrack in self.voicetracks:
