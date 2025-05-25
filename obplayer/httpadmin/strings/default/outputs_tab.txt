@@ -3,6 +3,10 @@ Outputs Tab
 
   Outputs: Outputs
 
+  Show Fade Settings: Show Fade Settings
+  fade_duration: Fade Out Duration (seconds)
+  fade_duration_tooltip: End-of-show fade duration, if needed to prevent abrupt cut-off. 0 to disable.
+
   Audio Output Settings: Audio Output Settings
 
   audio_out_mode: Audio Output Mode
