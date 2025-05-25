@@ -56,13 +56,13 @@ class LEDSignTrigger(object):
         sign_message = head_text + ":" + message_text + "........"
         if severity == "moderate":
             with open("/tmp/textfile", "a") as f:
-                f.write("\x1C3")
+                f.write("\x1c3")
         elif severity == "minor":
             with open("/tmp/textfile", "a") as f:
-                f.write("\x1C2")
+                f.write("\x1c2")
         else:
             with open("/tmp/textfile", "a") as f:
-                f.write("\x1C1")
+                f.write("\x1c1")
 
         if sign_message:
             with open("/tmp/textfile", "a") as f:
@@ -123,7 +123,7 @@ class LEDSignTrigger(object):
         self.trigger_serial_sign.write(
             "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         )
-        self.trigger_serial_sign.write("\x01Z00\x02\x45\x3B")
+        self.trigger_serial_sign.write("\x01Z00\x02\x45\x3b")
         loc_time = time.localtime
         self.trigger_serial_sign.write(time.strftime("%m%d%y", time.localtime()))
         self.trigger_serial_sign.write("\x04")
@@ -135,7 +135,7 @@ class LEDSignTrigger(object):
             "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         )
         self.trigger_serial_sign.write("\x01Z00\x02AA")
-        self.trigger_serial_sign.write("\x1B b")
+        self.trigger_serial_sign.write("\x1b b")
         self.trigger_serial_sign.write(" ")
         self.trigger_serial_sign.write("\x04")
         self.trigger_serial_sign.close()
@@ -146,7 +146,7 @@ class LEDSignTrigger(object):
             "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         )
         self.trigger_serial_sign.write("\x01Z00\x02AA")
-        self.trigger_serial_sign.write("\x1B b\x1C2\x0B\x31\x20\x13")
+        self.trigger_serial_sign.write("\x1b b\x1c2\x0b\x31\x20\x13")
         self.trigger_serial_sign.write("")
         self.trigger_serial_sign.write("\x04")
         self.trigger_serial_sign.close()
@@ -155,7 +155,7 @@ class LEDSignTrigger(object):
         self.trigger_serial_sign = serial.Serial(self.sign_serial_file, baudrate=9600)
         self.trigger_serial_sign.write("\x00\x00\x00\x00\x00\x00")
         self.trigger_serial_sign.write("\x01Z00\x02AA")
-        self.trigger_serial_sign.write("\x1B\x30\x61\x15\x1A\x33\x1C9")
+        self.trigger_serial_sign.write("\x1b\x30\x61\x15\x1a\x33\x1c9")
         message = obplayer.Config.setting("led_sign_init_message")
         self.trigger_serial_sign.write(message)
         # self.trigger_serial_sign.write("\x1B\x30\x6E\x56") #DDAD message
@@ -184,7 +184,7 @@ class LEDSignTrigger(object):
             self.trigger_serial_sign.write("\x02AA")  # STX
             # command codes (See p80 alphasign protocol doc)
             # fill display, RTL,slowest, standard 7 hi character set
-            self.trigger_serial_sign.write("\x1B\x30\x61\x15\x1A\x33")
+            self.trigger_serial_sign.write("\x1b\x30\x61\x15\x1a\x33")
             self.trigger_serial_sign.write(message)  # message!
             self.trigger_serial_sign.write("\x04")  # EOT
             self.trigger_serial_sign.close()

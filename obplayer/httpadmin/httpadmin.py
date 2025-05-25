@@ -628,7 +628,7 @@ class ObHTTPAdmin(httpserver.ObHTTPServer):
                             line = f.readline()
                             if not line:
                                 break
-                            if line.startswith(b"\xEF\xBB\xBF"):
+                            if line.startswith(b"\xef\xbb\xbf"):
                                 line = line[3:]
                             (name, _, text) = line.decode("utf-8").partition(":")
                             (name, text) = (name.strip(), text.strip())
