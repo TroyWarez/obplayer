@@ -84,9 +84,10 @@ class ObAudioMixerBin(ObOutputBin):
         # """
 
         pipeline_str = """
-            interpipesrc stream-sync=restart-ts is-live=true listen-to=interpipe-none format=time name=interpipesrc-main ! volume volume=1.0 name="channel-main-volume" ! audioconvert ! audioresample ! audiomixer name=mixer-primary ! volume volume=1.0 name=mixer-primary-volume ! audioconvert ! audioresample ! audiomixer name=mixer-alert ! queue ! interpipesink name=interpipe-output sync=true
-            interpipesrc stream-sync=restart-ts is-live=true listen-to=interpipe-none format=time name=interpipesrc-voicetrack ! volume volume=1.0 name="channel-voicetrack-volume" ! audioconvert ! audioresample ! mixer-primary.
-            interpipesrc stream-sync=restart-ts is-live=true listen-to=interpipe-none format=time name=interpipesrc-alert ! audioconvert ! audioresample ! mixer-alert.
+            interpipesrc stream-sync=restart-ts is-live=true listen-to=interpipe-none format=time name=interpipesrc-main ! queue ! volume volume=1.0 name="channel-main-volume" ! audioconvert ! audioresample ! mixer-primary.
+            interpipesrc stream-sync=restart-ts is-live=true listen-to=interpipe-none format=time name=interpipesrc-voicetrack ! queue ! volume volume=1.0 name="channel-voicetrack-volume" ! audioconvert ! audioresample ! mixer-primary.
+            interpipesrc stream-sync=restart-ts is-live=true listen-to=interpipe-none format=time name=interpipesrc-alert ! queue ! audioconvert ! audioresample ! mixer-alert.
+            audiomixer name=mixer-primary ! volume volume=1.0 name=mixer-primary-volume ! volume volume=1.0 name=mixer-prealert-volume ! audioconvert ! audioresample ! audiomixer name=mixer-alert ! queue ! interpipesink name=interpipe-output sync=true
         """
 
         self.pipeline_main = Gst.parse_launch(pipeline_str)
@@ -235,13 +236,15 @@ class ObAudioMixerBin(ObOutputBin):
         obplayer.Log.log("mixer received instruction " + instruction, "debug")
         # TODO instruction should be more like "mixer_mode_alert" here? (confusing with above alert/on which are different)
         if instruction == "alert_on":
-            self.pipeline_main.get_by_name("mixer-primary-volume").set_property(
+            self.pipeline_main.get_by_name("mixer-prealert-volume").set_property(
                 "volume", 0.0
             )
+            print(self.pipeline_main.get_by_name("mixer-prealert-volume").get_property("volume"))
         elif instruction == "alert_off":
-            self.pipeline_main.get_by_name("mixer-primary-volume").set_property(
+            self.pipeline_main.get_by_name("mixer-prealert-volume").set_property(
                 "volume", 1.0
             )
+            print(self.pipeline_main.get_by_name("mixer-prealert-volume").get_property("volume"))
         elif instruction == "voicetrack_on":
             self.main_fade({"volume": arguments["volume"], "time": arguments["fade"]})
         elif instruction == "voicetrack_off":
