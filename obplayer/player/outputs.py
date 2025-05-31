@@ -62,7 +62,8 @@ class ObFakeOutputBin(ObOutputBin):
 class ObAudioMixerBin(ObOutputBin):
     def __init__(self):
 
-        self.main_fade_thread = None
+        self.fade_threads = {}
+        self.fade_threads_cancel = {}
 
         # silent input section
         silent_pipeline_str = """
@@ -164,17 +165,22 @@ class ObAudioMixerBin(ObOutputBin):
         )
         self.pipeline_main.get_state(Gst.CLOCK_TIME_NONE)
 
-    def main_fade(self, arguments):
-        # print("main_fade: " + str(arguments))
+    def fade(self, arguments):
 
-        volume_element = self.pipeline_main.get_by_name("channel-main-volume")
+        volume_element_name = arguments["element"]
+
+        if(volume_element_name not in self.fade_threads):
+            self.fade_threads[volume_element_name] = None
+            self.fade_threads_cancel[volume_element_name] = False
+
+        volume_element = self.pipeline_main.get_by_name(volume_element_name)
         current_volume = volume_element.get_property("volume")
         target_volume = arguments["volume"]
         fade_time = arguments["time"]
         fade_run_per_second = 20
 
         obplayer.Log.log(
-            "main fade from "
+            volume_element_name + " fade from "
             + str(round(current_volume * 100))
             + "% to "
             + str(round(target_volume * 100))
@@ -201,12 +207,12 @@ class ObAudioMixerBin(ObOutputBin):
             mode = "out"
 
         def run():
-            self.main_fade_cancel = False
+            self.fade_threads_cancel[volume_element] = False
             current_volume = volume_element.get_property("volume")
 
             while True:
                 if (
-                    self.main_fade_cancel
+                    self.fade_threads_cancel[volume_element]
                     or (mode == "in" and current_volume >= target_volume)
                     or (mode == "out" and current_volume <= target_volume)
                 ):
@@ -224,13 +230,13 @@ class ObAudioMixerBin(ObOutputBin):
                 time.sleep(1 / fade_run_per_second)
 
         # cancel any existing run
-        if self.main_fade_thread is not None:
-            self.main_fade_cancel = True
-            self.main_fade_thread.join()
-            self.made_fade_thread = None
+        if self.fade_threads[volume_element_name] is not None:
+            self.fade_threads_cancel[volume_element] = True
+            self.fade_threads[volume_element_name].join()
+            self.fade_threads[volume_element_name] = None
 
-        self.main_fade_thread = threading.Thread(target=run)
-        self.main_fade_thread.start()
+        self.fade_threads[volume_element_name] = threading.Thread(target=run)
+        self.fade_threads[volume_element_name].start()
 
     def execute_instruction(self, instruction, arguments):
         obplayer.Log.log("mixer received instruction " + instruction, "debug")
@@ -246,11 +252,14 @@ class ObAudioMixerBin(ObOutputBin):
             )
             print(self.pipeline_main.get_by_name("mixer-prealert-volume").get_property("volume"))
         elif instruction == "voicetrack_on":
-            self.main_fade({"volume": arguments["volume"], "time": arguments["fade"]})
+            self.fade({"volume": arguments["volume"], "time": arguments["fade"], "element": "channel-main-volume"})
         elif instruction == "voicetrack_off":
-            self.main_fade({"volume": 1.0, "time": arguments["fade"]})
+            self.fade({"volume": 1.0, "time": arguments["fade"], "element": "channel-main-volume"})
         elif instruction == "main_fade":
-            self.main_fade(arguments)
+            arguments['element'] = "channel-main-volume"
+            self.fade(arguments)
+        elif instruction == "primary_on":
+            self.fade({"volume": 1.0, "time": 0.0, "element": "mixer-primary-volume"})
         else:
             print("unknown mixer instruction: " + instruction)
 
