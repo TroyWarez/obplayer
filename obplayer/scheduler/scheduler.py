@@ -599,17 +599,17 @@ class ObScheduler:
         self.do_showfade_update(ctrl, present_time)
 
     def do_showfade_update(self, ctrl, present_time):
-        self.showfade_ctrl.set_next_update(present_time + 0.25)
+        self.showfade_ctrl.set_next_update(present_time + 0.1)
         if self.present_show and type(self.present_show) is ObShow and self.present_show.fadeout:
             ending_in = self.present_show.end_time() - present_time
-            fade_duration = self.showfade_duration # adding 0.25 to account for this only being called every 0.25, so we might be late
+            fade_duration = self.showfade_duration
 
-            if(ending_in <= (fade_duration + 0.25)):
+            if(ending_in <= fade_duration):
                 obplayer.Player.outputs["mixer"].fade(
                     {
                         "element": "mixer-primary-volume",
                         "volume": 0.0,
-                        "time": self.showfade_duration
+                        "time": self.showfade_duration - 0.1
                     }
                 )
 
