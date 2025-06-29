@@ -192,13 +192,13 @@ class ObAudioMixerBin(ObOutputBin):
 
         # if fade time is zero, just set target volume
         if fade_time == 0:
-            volume_element.set_property("volume", target_volume)
-            return
+            fade_increment = target_volume
 
         # calculate fade increment
-        fade_increment = abs(current_volume - target_volume) / (
-            fade_time * fade_run_per_second
-        )
+        else: 
+            fade_increment = abs(current_volume - target_volume) / (
+                fade_time * fade_run_per_second
+            )
 
         # is this a fade in or fade out?
         if current_volume < target_volume:
@@ -207,12 +207,12 @@ class ObAudioMixerBin(ObOutputBin):
             mode = "out"
 
         def run():
-            self.fade_threads_cancel[volume_element] = False
+            self.fade_threads_cancel[volume_element_name] = False
             current_volume = volume_element.get_property("volume")
 
             while True:
                 if (
-                    self.fade_threads_cancel[volume_element]
+                    self.fade_threads_cancel[volume_element_name]
                     or (mode == "in" and current_volume >= target_volume)
                     or (mode == "out" and current_volume <= target_volume)
                 ):
@@ -229,13 +229,12 @@ class ObAudioMixerBin(ObOutputBin):
                 # print("volume: " + str(round(current_volume, 2)))
                 time.sleep(1 / fade_run_per_second)
 
-        # cancel any existing run
         if self.fade_threads[volume_element_name] is not None:
-            self.fade_threads_cancel[volume_element] = True
+            self.fade_threads_cancel[volume_element_name] = True
             self.fade_threads[volume_element_name].join()
             self.fade_threads[volume_element_name] = None
 
-        self.fade_threads[volume_element_name] = threading.Thread(target=run)
+        self.fade_threads[volume_element_name] = threading.Thread(target=run, daemon=True)
         self.fade_threads[volume_element_name].start()
 
     def execute_instruction(self, instruction, arguments):
