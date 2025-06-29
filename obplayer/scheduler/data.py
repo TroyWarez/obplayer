@@ -106,7 +106,7 @@ class ObRemoteData(obplayer.ObData):
 
     def shows_create_table(self):
         self.execute(
-            "CREATE TABLE shows (id INTEGER PRIMARY KEY, show_id INTEGER, name TEXT, type TEXT, description TEXT, datetime NUMERIC UNIQUE, duration NUMERIC, last_updated NUMERIC, last_track_fade NUMERIC)"
+            "CREATE TABLE shows (id INTEGER PRIMARY KEY, show_id INTEGER, name TEXT, type TEXT, description TEXT, datetime NUMERIC UNIQUE, duration NUMERIC, last_updated NUMERIC, last_track_fadeout TEXT)"
         )
         self.execute("CREATE UNIQUE INDEX datetime_index on shows (datetime)")
 
@@ -205,7 +205,7 @@ class ObRemoteData(obplayer.ObData):
     # Return false if edit not required.  Return lastrowid otherwise.
     #
     def show_addedit(
-        self, show_id, name, show_type, description, datetime, duration, last_updated
+        self, show_id, name, show_type, description, datetime, duration, last_updated, last_track_fadeout='auto'
     ):
         # determine whether there is already a show in this slot.
         rows = self.execute(
@@ -241,7 +241,7 @@ class ObRemoteData(obplayer.ObData):
                 str(datetime),
                 duration,
                 str(last_updated),
-                0,  # last_track_fade
+                str(last_track_fadeout)
             ),
         )
         return self.db.last_insert_rowid()

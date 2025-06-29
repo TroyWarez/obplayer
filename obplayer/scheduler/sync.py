@@ -435,6 +435,11 @@ class ObSync:
             show_last_updated = xml_get_first_tag_value(show, "last_updated", 0)
             show_media = xml_get_direct_children(show, "media")[0]
             show_voicetracks = xml_get_direct_children(show, "voicetracks")
+            show_last_track_fadeout = show.getElementsByTagName("last_track_fadeout")
+            if len(show_last_track_fadeout) > 0:
+                show_last_track_fadeout = xml_get_text(show_last_track_fadeout[0])
+            else:
+                show_last_track_fadeout = "auto"
 
             if len(show_voicetracks) > 0:
                 show_voicetracks = show_voicetracks[0]
@@ -487,6 +492,7 @@ class ObSync:
                     show_start_timestamp,
                     show_duration,
                     show_last_updated,
+                    show_last_track_fadeout,
                 )
 
                 start_times_list.append(show_start_timestamp)
