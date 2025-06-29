@@ -33,7 +33,7 @@ class ObPlaylist(object):
         self.voicetracks = obplayer.RemoteData.get_show_voicetracks(show_id)
 
         # how close to the voicetrack before we return it to queue playback?
-        self.voicetrack_timing_tolerance = 1
+        self.voicetrack_timing_tolerance = 0.25
         self.voicetrack_none_until = 0  # allow us to delay the next voicetrack return to prevent duplicate play requests
 
         if not self.voicetracks:
@@ -75,14 +75,15 @@ class ObPlaylist(object):
             # if the voicetrack is set relative to the current track, and has a positive delay, then it plays at the start of this track
             if voicetrack["order_num"] == self.pos and voicetrack["delay"] >= 0:
                 delta = voicetrack["delay"] - current_track_position
-                if delta >= 0 and delta < self.voicetrack_timing_tolerance:
+
+                if delta >= -self.voicetrack_timing_tolerance and delta <= self.voicetrack_timing_tolerance:
                     self.delay_voicetrack()
                     return [voicetrack, delta]
 
             # if the voicetrack is set relative to the next track, but has a negative delay, then it plays at the end of this track
             if voicetrack["order_num"] == (self.pos + 1) and voicetrack["delay"] < 0:
                 delta = track_ends_in - abs(voicetrack["delay"])
-                if delta >= 0 and delta < self.voicetrack_timing_tolerance:
+                if delta >= -self.voicetrack_timing_tolerance and delta <= self.voicetrack_timing_tolerance:
                     self.delay_voicetrack()
                     return [voicetrack, delta]
 
@@ -619,7 +620,7 @@ class ObScheduler:
         self.do_voicetrack_update(ctrl, present_time)
 
     def do_voicetrack_update(self, ctrl, present_time):
-        self.voicetrack_ctrl.set_next_update(present_time + 0.25)
+        self.voicetrack_ctrl.set_next_update(present_time + 0.2)
         if self.present_show:
             self.present_show.play_current_voicetrack(present_time)
 
