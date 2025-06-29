@@ -205,7 +205,15 @@ class ObRemoteData(obplayer.ObData):
     # Return false if edit not required.  Return lastrowid otherwise.
     #
     def show_addedit(
-        self, show_id, name, show_type, description, datetime, duration, last_updated, last_track_fadeout='auto'
+        self,
+        show_id,
+        name,
+        show_type,
+        description,
+        datetime,
+        duration,
+        last_updated,
+        last_track_fadeout="auto",
     ):
         # determine whether there is already a show in this slot.
         rows = self.execute(
@@ -241,7 +249,7 @@ class ObRemoteData(obplayer.ObData):
                 str(datetime),
                 duration,
                 str(last_updated),
-                str(last_track_fadeout)
+                str(last_track_fadeout),
             ),
         )
         return self.db.last_insert_rowid()

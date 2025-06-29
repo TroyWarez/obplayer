@@ -169,7 +169,7 @@ class ObAudioMixerBin(ObOutputBin):
 
         volume_element_name = arguments["element"]
 
-        if(volume_element_name not in self.fade_threads):
+        if volume_element_name not in self.fade_threads:
             self.fade_threads[volume_element_name] = None
             self.fade_threads_cancel[volume_element_name] = False
 
@@ -180,7 +180,8 @@ class ObAudioMixerBin(ObOutputBin):
         fade_run_per_second = 20
 
         obplayer.Log.log(
-            volume_element_name + " fade from "
+            volume_element_name
+            + " fade from "
             + str(round(current_volume * 100))
             + "% to "
             + str(round(target_volume * 100))
@@ -195,7 +196,7 @@ class ObAudioMixerBin(ObOutputBin):
             fade_increment = target_volume
 
         # calculate fade increment
-        else: 
+        else:
             fade_increment = abs(current_volume - target_volume) / (
                 fade_time * fade_run_per_second
             )
@@ -234,7 +235,9 @@ class ObAudioMixerBin(ObOutputBin):
             self.fade_threads[volume_element_name].join()
             self.fade_threads[volume_element_name] = None
 
-        self.fade_threads[volume_element_name] = threading.Thread(target=run, daemon=True)
+        self.fade_threads[volume_element_name] = threading.Thread(
+            target=run, daemon=True
+        )
         self.fade_threads[volume_element_name].start()
 
     def execute_instruction(self, instruction, arguments):
@@ -244,18 +247,38 @@ class ObAudioMixerBin(ObOutputBin):
             self.pipeline_main.get_by_name("mixer-prealert-volume").set_property(
                 "volume", 0.0
             )
-            print(self.pipeline_main.get_by_name("mixer-prealert-volume").get_property("volume"))
+            print(
+                self.pipeline_main.get_by_name("mixer-prealert-volume").get_property(
+                    "volume"
+                )
+            )
         elif instruction == "alert_off":
             self.pipeline_main.get_by_name("mixer-prealert-volume").set_property(
                 "volume", 1.0
             )
-            print(self.pipeline_main.get_by_name("mixer-prealert-volume").get_property("volume"))
+            print(
+                self.pipeline_main.get_by_name("mixer-prealert-volume").get_property(
+                    "volume"
+                )
+            )
         elif instruction == "voicetrack_on":
-            self.fade({"volume": arguments["volume"], "time": arguments["fade"], "element": "channel-main-volume"})
+            self.fade(
+                {
+                    "volume": arguments["volume"],
+                    "time": arguments["fade"],
+                    "element": "channel-main-volume",
+                }
+            )
         elif instruction == "voicetrack_off":
-            self.fade({"volume": 1.0, "time": arguments["fade"], "element": "channel-main-volume"})
+            self.fade(
+                {
+                    "volume": 1.0,
+                    "time": arguments["fade"],
+                    "element": "channel-main-volume",
+                }
+            )
         elif instruction == "main_fade":
-            arguments['element'] = "channel-main-volume"
+            arguments["element"] = "channel-main-volume"
             self.fade(arguments)
         elif instruction == "primary_on":
             self.fade({"volume": 1.0, "time": 0.0, "element": "mixer-primary-volume"})

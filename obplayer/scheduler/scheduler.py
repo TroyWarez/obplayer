@@ -76,14 +76,20 @@ class ObPlaylist(object):
             if voicetrack["order_num"] == self.pos and voicetrack["delay"] >= 0:
                 delta = voicetrack["delay"] - current_track_position
 
-                if delta >= -self.voicetrack_timing_tolerance and delta <= self.voicetrack_timing_tolerance:
+                if (
+                    delta >= -self.voicetrack_timing_tolerance
+                    and delta <= self.voicetrack_timing_tolerance
+                ):
                     self.delay_voicetrack()
                     return [voicetrack, delta]
 
             # if the voicetrack is set relative to the next track, but has a negative delay, then it plays at the end of this track
             if voicetrack["order_num"] == (self.pos + 1) and voicetrack["delay"] < 0:
                 delta = track_ends_in - abs(voicetrack["delay"])
-                if delta >= -self.voicetrack_timing_tolerance and delta <= self.voicetrack_timing_tolerance:
+                if (
+                    delta >= -self.voicetrack_timing_tolerance
+                    and delta <= self.voicetrack_timing_tolerance
+                ):
                     self.delay_voicetrack()
                     return [voicetrack, delta]
 
@@ -365,7 +371,10 @@ class ObShow(object):
                     order_num=media["order_num"],
                     artist=media["artist"],
                     title=media["title"],
-                    mixerend=['primary_on', {}], # restore the mixer from fade-out when the track stops
+                    mixerend=[
+                        "primary_on",
+                        {},
+                    ],  # restore the mixer from fade-out when the track stops
                 )
             else:
                 self.fadeout = False
@@ -588,7 +597,7 @@ class ObScheduler:
 
         self.voicetrack_ctrl.set_request_callback(self.do_voicetrack_request)
         self.voicetrack_ctrl.set_update_callback(self.do_voicetrack_update)
-        
+
         self.showfade_duration = float(obplayer.Config.setting("fade_duration", 5))
         self.showfade_ctrl.set_request_callback(self.do_showfade_request)
         self.showfade_ctrl.set_update_callback(self.do_showfade_update)
@@ -601,16 +610,20 @@ class ObScheduler:
 
     def do_showfade_update(self, ctrl, present_time):
         self.showfade_ctrl.set_next_update(present_time + 0.1)
-        if self.present_show and type(self.present_show) is ObShow and self.present_show.fadeout:
+        if (
+            self.present_show
+            and type(self.present_show) is ObShow
+            and self.present_show.fadeout
+        ):
             ending_in = self.present_show.end_time() - present_time
             fade_duration = self.showfade_duration
 
-            if(ending_in <= fade_duration):
+            if ending_in <= fade_duration:
                 obplayer.Player.outputs["mixer"].fade(
                     {
                         "element": "mixer-primary-volume",
                         "volume": 0.0,
-                        "time": self.showfade_duration - 0.1
+                        "time": self.showfade_duration - 0.1,
                     }
                 )
 
