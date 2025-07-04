@@ -618,12 +618,13 @@ class ObScheduler:
             ending_in = self.present_show.end_time() - present_time
             fade_duration = self.showfade_duration
 
-            if ending_in <= fade_duration:
+            # fade when needed, as long as we have at least 0.5s left to fade
+            if ending_in <= fade_duration and ending_in > 0.5:
                 obplayer.Player.outputs["mixer"].fade(
                     {
                         "element": "mixer-primary-volume",
                         "volume": 0.0,
-                        "time": self.showfade_duration - 0.1,
+                        "time": ending_in - 0.1,
                     }
                 )
 
