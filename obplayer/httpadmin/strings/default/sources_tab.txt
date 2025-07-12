@@ -33,6 +33,7 @@ Sources Tab
   aoip_in_uri: AoIP Source URI
   aoip_in_uri_tooltip: URI of source audio stream to use.  This can either be an rtsp:// uri or an sdp:/// file reference.
 
+  station_override_enabled: Enable Station Override
 
   RTP/Livewire Audio Input Settings: RTP/Livewire Audio Input Settings
 
