@@ -92,6 +92,7 @@ class ObTestSignalPipeline(ObGstPipeline):
             self.set_property("video-sink", self.player.outputs["visual"].get_bin())
         ObGstPipeline.patch(self, mode)
         self.wait_state(Gst.State.PLAYING)
+        self.player.outputs["mixer"].main_on()
         if obplayer.Config.setting("gst_init_callback"):
             os.system(obplayer.Config.setting("gst_init_callback"))
 
