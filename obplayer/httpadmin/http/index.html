@@ -1719,22 +1719,13 @@
 
           <% if obplayer.Config.setting('show_station_remote_override_settings'): %>
 
-          <h4 data-t title="station_override_tooltip">Override settings</h4>
+          <h4 data-t title="station_override_tooltip">Override Settings (Out)</h4>
 
           <table class="settings">
-            <tr>
-              <td data-t>station_override_enabled</td>
-              <td><input type="checkbox" name="station_override_enabled" value="1" <%= obplayer.HTTPAdmin.form_item_checked('station_override_enabled') %>></td>
-            </tr>
-            <% if obplayer.Config.setting('station_override_enabled'): %>
-            <tr>
+            <!-- <tr>
               <td data-t>station_override</td>
               <td><button type="button" name="button" class="audio-override-btn">Start</button></td>
-            </tr>
-            <tr>
-              <td data-t>station_override_monitored_streams</td>
-              <td><input type="text" name="station_override_monitored_streams" value="<%= obplayer.Config.setting('station_override_monitored_streams',True) %>"></td>
-            </tr>
+            </tr> -->
             <tr>
               <td data-t>station_override_server_ip</td>
               <td><input type="text" name="station_override_server_ip" value="<%= obplayer.Config.setting('station_override_server_ip',True) %>"></td>
@@ -1773,6 +1764,20 @@
                   <option value="256"<%= obplayer.HTTPAdmin.form_item_selected('station_override_server_bitrate','256') %>>256 kbps</option>
                   <option value="320"<%= obplayer.HTTPAdmin.form_item_selected('station_override_server_bitrate','320') %>>320 kbps</option>
                 </select></td>
+            </tr>
+          </table>
+
+          <h4 data-t title="station_override_tooltip">Override Settings (In)</h4>
+
+          <table class="settings">
+            <tr>
+              <td data-t>station_override_enabled</td>
+              <td><input type="checkbox" name="station_override_enabled" value="1" <%= obplayer.HTTPAdmin.form_item_checked('station_override_enabled') %>></td>
+            </tr>
+            <% if obplayer.Config.setting('station_override_enabled'): %>
+            <tr>
+              <td data-t>station_override_monitored_streams</td>
+              <td><input type="text" name="station_override_monitored_streams" value="<%= obplayer.Config.setting('station_override_monitored_streams',True) %>"></td>
             </tr>
             <% end %>
           </table>
