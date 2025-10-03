@@ -336,7 +336,13 @@ class ObHTTPAdmin(httpserver.ObHTTPServer):
             else:
                 del request.args["http_admin_password_retype"]
                 self.password = request.args["http_admin_password"][0]
-
+                
+        if "http_admin_username" in request.args:
+            if request.args["http_admin_username"][0] == "":
+                del request.args["http_admin_username"]
+            else:
+                self.username = request.args["http_admin_username"][0]
+            
         # run through each setting and make sure it's valid. if not, complain.
         for key in request.args:
             setting_name = key
@@ -350,7 +356,8 @@ class ObHTTPAdmin(httpserver.ObHTTPServer):
         # we didn't get an errors on validate, so update each setting now.
         settings = {key: value[0] for (key, value) in request.args.items()}
         obplayer.Config.save_settings(settings)
-
+        
+        
         return {"status": True}
 
     def req_import(self, request):
