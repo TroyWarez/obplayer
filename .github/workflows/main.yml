@@ -1,14 +1,10 @@
-name: Format Python code with Black
+name: Lint
 
 on: [push, pull_request]
 
 jobs:
-  format:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - uses: psf/black@stable
-        with:
-          version: '24.4.0' # Or other desired Black version
-          # Alternatively, read version from pyproject.toml:
-          # use_pyproject: true
